@@ -13,6 +13,7 @@ with DAG(
 
     wait_for_file = FileSensor(
         task_id="wait_for_file",
+        fs_conn_id="fs_default",
         filepath="/tmp/airflow_lab/input/customers.csv",
         poke_interval=10,
         timeout=300,
