@@ -34,6 +34,7 @@ with DAG(
         awk 'NR==1{print $0",country"; next} {print $0",FRANCE"}' /tmp/airflow_lab/input/customers.csv > /tmp/airflow_lab/work/customers_transformed.csv
         echo "Fichier transformé :"
         cat /tmp/airflow_lab/work/customers_transformed.csv
+        rm /tmp/airflow_lab/input/customers.csv
         """
     )
 
