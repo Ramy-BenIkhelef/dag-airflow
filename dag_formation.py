@@ -3,6 +3,7 @@ from airflow import DAG
 from airflow.models import Variable
 from airflow.providers.standard.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup
+from airflow.sdk.execution_time.xcom import XCom
 
 def fonction_ex_1():
     test_variable = Variable.get("key_1")
