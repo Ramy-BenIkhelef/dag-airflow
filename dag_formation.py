@@ -5,7 +5,7 @@ from airflow.providers.standard.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup
 from airflow.sdk.execution_time.xcom import XCom
 
-def fonction_ex_1():
+def fonction_ex_1(ti):
     test_variable = Variable.get("key_1")
     ti.xcom_push(key='ex_1', value="ma clé xcom")
 
