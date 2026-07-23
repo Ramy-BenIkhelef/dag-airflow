@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.utils.trigger_rule import TriggerRule
 from airflow.utils.task_group import TaskGroup
-from airflow.model import Variable
+from airflow.models import Variable
  
 
 test_variable = Variable.get("key_1")
