@@ -9,7 +9,7 @@ def fonction_ex_1():
     ti.xcom_push(key='ex_1', value="ma clé xcom")
 
 def fonction_ex_2(ti):
-    valeur = ti.xcom_pull(task_ids="groupe_1.ex_1")
+    valeur = ti.xcom_pull(task_ids='ex_xcom' , key='ex_1')
     print(f"Valeur reçue depuis XCom : {valeur}")
 
 with DAG(
