@@ -25,7 +25,7 @@ with DAG(
         )
         ex_1 = BashOperator(
             task_id="ex_1",
-            bash_command="echo {{test_variable}}"
+            bash_command=f"echo '{test_variable}'"
         )
 
         [hello , ex_1]
