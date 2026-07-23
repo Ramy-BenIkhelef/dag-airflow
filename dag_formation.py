@@ -16,11 +16,11 @@ with DAG(
 
     ex_1 = BashOperator(
         task_id="ex_1",
-        bash_command="echo 'deuxième tache"
+        bash_command="echo 'deuxième tache'"
     )   
     ex_2 = BashOperator(
         task_id="ex_2",
-        bash_command="echo 'troisieme tache"
+        bash_command="echo 'troisieme tache'"
     )
 
 ex_1 >> hello >> ex_2
