@@ -23,4 +23,4 @@ with DAG(
         bash_command="echo 'troisieme tache'"
     )
 
-ex_1 >> hello >> ex_2
+ex_1 >> [hello , ex_2]
