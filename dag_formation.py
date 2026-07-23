@@ -16,7 +16,7 @@ with DAG(
 
     ex_1 = BashOperator(
         task_id="ex_1",
-        bash_command="echo 'deuxième tache'"
+        bash_command="sleep 10"
     )   
     ex_2 = BashOperator(
         task_id="ex_2",
