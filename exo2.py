@@ -29,7 +29,7 @@ with DAG(
             bash_command="echo 'ma tache 4'",
         )
        
-       tache2 >> tache4
+    tache2 >> tache4
         
 tache1 >> echo_donne
 
