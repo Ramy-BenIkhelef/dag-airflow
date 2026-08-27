@@ -27,6 +27,7 @@ with DAG(
         tache4 = BashOperator(
             task_id="tache4",
             bash_command="echo 'ma tache 4'",
+            trigger_rule="all_failed"
         )
        
     tache2 >> tache4
