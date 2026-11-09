@@ -15,7 +15,7 @@ POOL = "chaines_exclusives"
 START = pendulum.datetime(2025, 1, 1, tz="Europe/Paris")
 
 @dag(
-    dag_id="chaine1"
+    dag_id="chaine1",
     start_date=START,
     schedule=None,
     catchup=False,
@@ -62,7 +62,7 @@ def chaine_1():
 
 
 @dag(
-    dag_id="chaine2"
+    dag_id="chaine2",
     start_date=START,
     schedule=None,
     catchup=False,
@@ -79,7 +79,7 @@ def chaine_2():
 
 
 @dag(
-    dag_id="pilotage"
+    dag_id="pilotage",
     start_date=START,
     schedule="0 0 * * *",
     catchup=False,
