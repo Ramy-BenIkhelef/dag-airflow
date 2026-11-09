@@ -1,18 +1,16 @@
-from datetime import timedelta
-
 import pendulum
 
-from airflow.sdk import dag, task
-from airflow.providers.ssh.hooks.ssh import SSHHook
-from airflow.providers.ssh.operators.ssh import SSHOperator
-from airflow.providers.standard.sensors.date_time import DateTimeSensor
+from airflow.sdk import dag
+from airflow.providers.standard.operators.bash import BashOperator
 from airflow.providers.standard.operators.trigger_dagrun import (
     TriggerDagRunOperator,
 )
+from airflow.providers.standard.sensors.date_time import DateTimeSensor
+from airflow.providers.standard.sensors.filesystem import FileSensor
 
-SSH_CONN = "serveur_ssh"
 POOL = "chaines_exclusives"
 START = pendulum.datetime(2025, 1, 1, tz="Europe/Paris")
+
 
 @dag(
     dag_id="chaine1",
@@ -22,11 +20,10 @@ START = pendulum.datetime(2025, 1, 1, tz="Europe/Paris")
     max_active_runs=1,
 )
 def chaine_1():
-    a = SSHOperator(
+    a = BashOperator(
         task_id="Job_A",
-        ssh_conn_id=SSH_CONN,
-        command="/opt/jobs/job_a.sh",
-        cmd_timeout=None,
+        bash_command="bash /opt/jobs/job_a.sh ",
+        skip_on_exit_code=None,
     )
 
     attendre_2h = DateTimeSensor(
@@ -36,11 +33,10 @@ def chaine_1():
         poke_interval=30,
     )
 
-    b = SSHOperator(
+    b = BashOperator(
         task_id="Job_B",
-        ssh_conn_id=SSH_CONN,
-        command="/opt/jobs/job_b.sh",
-        cmd_timeout=None,
+        bash_command="bash /opt/jobs/job_b.sh ",
+        skip_on_exit_code=None,
     )
 
     attendre_3h = DateTimeSensor(
@@ -50,15 +46,13 @@ def chaine_1():
         poke_interval=30,
     )
 
-    c = SSHOperator(
+    c = BashOperator(
         task_id="Job_C",
-        ssh_conn_id=SSH_CONN,
-        command="/opt/jobs/job_c.sh",
-        cmd_timeout=None,
+        bash_command="bash /opt/jobs/job_c.sh ",
+        skip_on_exit_code=None,
     )
 
     a >> attendre_2h >> b >> attendre_3h >> c
-
 
 
 @dag(
@@ -69,13 +63,11 @@ def chaine_1():
     max_active_runs=1,
 )
 def chaine_2():
-    SSHOperator(
+    BashOperator(
         task_id="Job_D",
-        ssh_conn_id=SSH_CONN,
-        command="/opt/jobs/job_d.sh",
-        cmd_timeout=None,
+        bash_command="bash /opt/jobs/job_d.sh ",
+        skip_on_exit_code=None,
     )
-
 
 
 @dag(
@@ -96,31 +88,19 @@ def pilotage_chaines():
         poke_interval=30,
     )
 
-    @task.sensor(
-        poke_interval=60,
-        timeout=timedelta(hours=23),
+    attendre_fichier = FileSensor(
+        task_id="attendre_fichier",
+        fs_conn_id="fs_default",
+        filepath="/data/entree/*.csv",
         mode="reschedule",
+        poke_interval=60,
+        timeout=23 * 3600,
         soft_fail=True,
     )
-    def attendre_fichier():
-        # Vérification sur le serveur distant, pas sur le worker Airflow.
-        with SSHHook(ssh_conn_id=SSH_CONN).get_conn() as client:
-            _, stdout, stderr = client.exec_command(
-                "find /data/entree -maxdepth 1 -type f "
-                "-name '*.csv' -print -quit"
-            )
-            resultat = stdout.read().decode().strip()
-            erreur = stderr.read().decode()
-            code = stdout.channel.recv_exit_status()
-
-            if code != 0:
-                raise RuntimeError(f"Vérification SSH échouée : {erreur}")
-
-            return bool(resultat)
 
     lancer_1 = TriggerDagRunOperator(
         task_id="lancer_chaine_1",
-        trigger_dag_id="chaine_1",
+        trigger_dag_id="chaine1",
         conf={
             "heure_2": (
                 "{{ data_interval_end.in_timezone('Europe/Paris')"
@@ -139,7 +119,7 @@ def pilotage_chaines():
 
     lancer_2 = TriggerDagRunOperator(
         task_id="lancer_chaine_2",
-        trigger_dag_id="chaine_2",
+        trigger_dag_id="chaine2",
         pool=POOL,
         wait_for_completion=True,
         deferrable=True,
@@ -147,7 +127,7 @@ def pilotage_chaines():
     )
 
     attendre_1h >> lancer_1
-    attendre_fichier() >> lancer_2
+    attendre_fichier >> lancer_2
 
 
 chaine_1()
