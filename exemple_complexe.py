@@ -14,9 +14,8 @@ SSH_CONN = "serveur_ssh"
 POOL = "chaines_exclusives"
 START = pendulum.datetime(2025, 1, 1, tz="Europe/Paris")
 
-
-# CHAÎNE 1 : A, puis B à partir de 2 h, puis C à partir de 3 h.
 @dag(
+    dag_id="chaine1"
     start_date=START,
     schedule=None,
     catchup=False,
@@ -61,8 +60,9 @@ def chaine_1():
     a >> attendre_2h >> b >> attendre_3h >> c
 
 
-# CHAÎNE 2 : traitement du fichier distant.
+
 @dag(
+    dag_id="chaine2"
     start_date=START,
     schedule=None,
     catchup=False,
@@ -72,14 +72,14 @@ def chaine_2():
     SSHOperator(
         task_id="Job_D",
         ssh_conn_id=SSH_CONN,
-        # Le script doit revérifier les fichiers avant de les traiter.
         command="/opt/jobs/job_d.sh",
         cmd_timeout=None,
     )
 
 
-# PILOTAGE : un verrou commun pendant toute chaque chaîne.
+
 @dag(
+    dag_id="pilotage"
     start_date=START,
     schedule="0 0 * * *",
     catchup=False,
