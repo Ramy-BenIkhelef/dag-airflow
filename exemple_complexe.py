@@ -17,6 +17,7 @@ START = pendulum.datetime(2025, 1, 1, tz="Europe/Paris")
     start_date=START,
     schedule=None,
     catchup=False,
+    tags=['complexe', 'shedule_complex'],
     max_active_runs=1,
 )
 def chaine_1():
@@ -60,6 +61,7 @@ def chaine_1():
     start_date=START,
     schedule=None,
     catchup=False,
+    tags=['complexe', 'shedule_complex'],
     max_active_runs=1,
 )
 def chaine_2():
@@ -76,6 +78,7 @@ def chaine_2():
     schedule="0 0 * * *",
     catchup=False,
     max_active_runs=1,
+    tags=['complexe', 'shedule_complex'],
 )
 def pilotage_chaines():
     attendre_1h = DateTimeSensor(
